@@ -293,5 +293,58 @@ select file_id, file_name, (bytes/1024)/1024 bytes_MB, autoextensible from dba_t
 
 
 
-alter database tempfile '/u01/app/oracle/oradata/cm/dados01.dbf' resize 1024m;
-alter tablespace TEMP add tempfile '+DG_DATA' size 32767M;
+alter database tempfile '/oracle/SLP/sapdata2/temp_2/temp.data2' resize 3200m;
+alter tablespace PSAPTEMP add tempfile '/oracle/SLP/sapdata2/temp_2/temp.data2' size 1000M;
+ 
+
+
+
+set linesize 200
+set pagesize 200
+column dummy          noprint
+column pct_used       format 999.9       heading "%|Used"
+column name           format a25         heading "Tablespace Name"
+column Mbytes         format 999,999,999 heading "MBytes" 
+column Used_Mbytes    format 999,999,999 heading "Used|MBytes"
+column Free_Mbytes    format 999,999,999 heading "Free|MBytes"
+column Largest_Mbytes format 999,999,999 heading "Largest|MBytes"
+column Max_Size       format 999,999,999 heading "MaxPoss|MBytes"
+column pct_max_used   format 999.9       heading "%|Max|Used"
+break   on  report 
+compute sum of Mbytes      on report 
+compute sum of Free_Mbytes on report 
+compute sum of Used_Mbytes on report 
+select ( select decode(extent_management,'LOCAL','*',' ') || 
+                decode(segment_space_management,'AUTO','a ','m ')
+       from dba_tablespaces
+       where tablespace_name = b.tablespace_name
+     ) || nvl(b.tablespace_name,nvl(a.tablespace_name,'UNKOWN')) name
+     , Mbytes_alloc Mbytes
+     , Mbytes_alloc-nvl(Mbytes_free,0) Used_Mbytes
+     , nvl(Mbytes_free,0) Free_Mbytes
+     , ((Mbytes_alloc-nvl(Mbytes_free,0))/Mbytes_alloc)*100 pct_used
+     , nvl(Mbytes_largest,0) Largest_Mbytes
+     , nvl(Mbytes_max,Mbytes_alloc) Max_Size
+     , decode(Mbytes_max,0,0,(Mbytes_alloc/Mbytes_max)*100) pct_max_used
+from ( select sum(bytes)/1024/1024   Mbytes_free
+        , max(bytes)/1024/1024 Mbytes_largest
+        , tablespace_name
+     from  sys.dba_free_space
+     group by tablespace_name
+   ) a,
+     ( select sum(bytes)/1024/1024      Mbytes_alloc
+        , sum(maxbytes)/1024/1024 Mbytes_max
+        , tablespace_name
+     from sys.dba_data_files
+     group by tablespace_name
+     union all
+       select sum(bytes)/1024/1024      Mbytes_alloc
+        , sum(maxbytes)/1024/1024 Mbytes_max
+        , tablespace_name
+     from sys.dba_temp_files
+     group by tablespace_name
+   ) b
+where a.tablespace_name (+) = b.tablespace_name
+order by 1
+/
+

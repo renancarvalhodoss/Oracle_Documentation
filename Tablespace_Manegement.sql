@@ -348,3 +348,6 @@ from ( select sum(bytes)/1024/1024   Mbytes_free
 where a.tablespace_name (+) = b.tablespace_name
 order by 1
 /
+
+
+teste

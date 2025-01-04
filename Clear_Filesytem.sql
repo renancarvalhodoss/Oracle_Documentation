@@ -72,7 +72,7 @@ find . \( -name "*.trc" -a -cmin +1 \) -exec rm -r {} \; &
 find . \( -name "*.xml" -a -cmin +5 \) -exec rm -r {} \; &
 find . \( -name "*.log" -a -mtime +1 \) -exec rm -r {} \; &
 find . -name "*.log" -mtime +104 -exec gzip {} \;
-find . \( -name "*.aud" -a -cmin +1 \) -exec rm -r {} \; &
+find . \( -name "*.xml" -a -mtime +1 \) -exec rm -r {} \; &
 
 find /u01/app/oracle/admin/ogld01dr/adump \( -name "*.aud" -a -cmin +1 \) -exec rm -r {} \; &
 find /u01/app/oracle/admin \( -name "*.aud" -a -cmin +1 \) -exec rm -r {} \; &

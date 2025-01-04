@@ -6,7 +6,7 @@ select w.sid,s.username, w.event, w.state, w.wait_time, w.seconds_in_wait
 from gv$session_wait w, gv$session s
 where s.sid=w.sid and s.status='ACTIVE'
 and w.seconds_in_wait > 0
-and w.sid in (1192)
+and w.sid in (1435)
 and s.username != 'unknown'
 and s.type     != 'background'
 and s.osuser   != 'oracle'
@@ -163,7 +163,7 @@ select
 'EVENT........................................: '||EVENT,
 'EVENT#.......................................: '||EVENT#,
 'PREV_SQL_ID..................................: '||PREV_SQL_ID
-from gv$session where SID = '1192';
+from gv$session where SID = '1435';
 
 
 

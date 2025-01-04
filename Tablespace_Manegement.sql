@@ -22,7 +22,7 @@
   where a.tablespace_name (+) = b.tablespace_name and
         c.tablespace_name (+) = b.tablespace_name
 --and   trunc(((mbytes_alloc-nvl(mbytes_free,0))/mbytes_alloc)*100,2) >80
---AND  b.tablespace_name='TS_INTRANET_DT1'
+AND  b.tablespace_name='EAI_DADOS_1024K'
    order by 6 asc;
 
 
@@ -193,7 +193,9 @@ ALTER database datafile '/oracle/INTPRD/data3/ts_intranet_ix1_01.dbf' resize 270
      ALTER database datafile '+DATA/PID/DATAFILE/sysaux.270.1119904063' resize 5500m;
 
 --create new datafile
-     alter tablespace EAIDEV add datafile '/oracle/DEAI/oradata/eaidev13.dbf' size 470m;
+     alter tablespace EAI_DADOS_1024K add datafile '/oracle/ICT/data30/EAI_DADOS_1024K_11.dbf' size 5000m;
+     alter tablespace MSAF_DATA01 add datafile '+DATA_MSAF_2024' size 32767m;
+     alter tablespace MSAF_DATA01 add datafile '+DATA_MSAF_2024' size 32767m;
      alter tablespace EAIDEV add datafile '/oracle/DEAI/oradata3/eaidev14.dbf' size 520m;
      alter tablespace MSAF_DATA add datafile '+DG_MSAF_DATA' size 32767m;
      alter tablespace PSAPSR3 add datafile '/oracle/ACP/sapdata3/sr3_13/sr3.data18' size 32767m;

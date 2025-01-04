@@ -22,7 +22,7 @@ col username format a15
 select a.sql_id,a.sid, a.serial#, a.username, a.status, a.action, a.module, a.machine, b.sql_text from gv$session a, gv$sqlarea b where a.sql_address=b.address
 and a.sql_id = b.sql_id
 --and a.status = 'ACTIVE'
-and a.sid in (2869);  <<--- colocar SID informado no chamado para conseguir o SQL_ID
+and a.sid in (1435);  <<--- colocar SID informado no chamado para conseguir o SQL_ID
 
 SQL_ID               SID    SERIAL# USERNAME        STATUS   ACTION                                                           MODULE                                                           MACHINE                   SQL_TEXT
 
@@ -61,7 +61,7 @@ SQL>
 SET SERVEROUTPUT ON 
 declare stmt_task VARCHAR2(40);
   begin
-    stmt_task := DBMS_SQLTUNE.CREATE_TUNING_TASK(sql_id => '6bqbzqzk8br50', scope => 'comprehensive', time_limit  => 600);
+    stmt_task := DBMS_SQLTUNE.CREATE_TUNING_TASK(sql_id => '2tafs2hc35u62', scope => 'comprehensive', time_limit  => 600);
     DBMS_OUTPUT.put_line('task_id: ' || stmt_task );
     end;
 /
@@ -79,7 +79,7 @@ declare stmt_task VARCHAR2(40);
  
 
 begin
-DBMS_SQLTUNE.EXECUTE_TUNING_TASK(task_name => 'TASK_253783');
+DBMS_SQLTUNE.EXECUTE_TUNING_TASK(task_name => 'TASK_254389');
 end;
 /
 
@@ -97,16 +97,17 @@ set long 999999999
 set lines 190
 col recommendations for a180
 set pages 500
-SELECT DBMS_SQLTUNE.REPORT_TUNING_TASK('TASK_253783') AS recommendations FROM dual;
+SELECT DBMS_SQLTUNE.REPORT_TUNING_TASK('TASK_254389') AS recommendations FROM dual;
 
 
 
 execute dbms_stats.gather_table_stats(ownname => 'FDSPPRD', tabname =>'PS_DPSP_RED_EU_PND', estimate_percent => DBMS_STATS.AUTO_SAMPLE_SIZE, method_opt => 'FOR ALL COLUMNS SIZE AUTO', cascade => TRUE);
 
 
-   execute dbms_sqltune.accept_sql_profile(task_name => 'TASK_253783', task_owner => 'SYS', replace => TRUE);
+   execute dbms_stats.gather_table_stats(ownname => 'FDSPPRD', tabname =>'PS_DPSP_RED_EU_PND', estimate_percent =>DBMS_STATS.AUTO_SAMPLE_SIZE, method_opt => 'FOR ALL COLUMNS SIZE AUTO', cascade => TRUE);
 
 
+execute dbms_sqltune.accept_sql_profile(task_name => 'TASK_254389', task_owner => 'SYS', replace => TRUE);
 
 
 execute dbms_sqltune.accept_sql_profile(task_name => 'TASK_252435', task_owner => 'SYS', replace => TRUE);

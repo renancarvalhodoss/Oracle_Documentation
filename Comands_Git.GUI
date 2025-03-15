@@ -1,1 +1,27 @@
-criar 
+#  Criar um novo repositório localmente
+git init
+
+# Clonar um repositório existente
+git clone https://github.com/usuario/repositorio.git
+
+#  Verificar status das alterações
+git status
+
+# Adicionar arquivos ao controle de versão
+git add nome_do_arquivo  # Adiciona um arquivo específico
+git add .                # Adiciona todas as alterações
+
+#  Confirmar as alterações no repositório local
+git commit -m "Descrição da alteração"
+
+#  Enviar as alterações para o repositório remoto
+git push origin main  # Envia para a branch 'main'
+
+# verifica branchs existentes
+git branch
+
+# cria uma nova branch
+git branch nome-da-branch
+
+# alterar branch
+git checkout nome-da-branch

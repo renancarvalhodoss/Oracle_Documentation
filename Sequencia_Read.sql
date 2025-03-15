@@ -71,9 +71,6 @@ ORDER BY
 
 
 
-
-
-
 set pagesize 1000
 set linesize 1000
 select

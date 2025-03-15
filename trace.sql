@@ -1,0 +1,1 @@
+ALTER SESSION SET sql_trace = TRUE;

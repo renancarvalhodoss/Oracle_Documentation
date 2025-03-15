@@ -40,17 +40,3 @@ ALTER DISKGROUP DATA ADD DISK
 'ORCL:DISK010'
 DROP DISK 'DISK002',
 'DISK008' rebalance power 2;
-
-
-
-
-
-
-
-
-
-
-
-
-
-

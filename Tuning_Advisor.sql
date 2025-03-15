@@ -8,8 +8,9 @@ col SQL_TEXT format a60
 col machine format a25
 col username format a15
 select a.sql_id,a.sid, a.serial#, a.username, a.status, a.action, a.module, a.machine, b.sql_text from gv$session a, gv$sqlarea b where a.sql_address=b.address
-and a.status = 'ACTIVE';
-and a.sid in (1192);  <<--- colocar SID informado no chamado para conseguir o SQL_ID
+and a.status = 'ACTIVE'
+and a.sid in (386); <<--- colocar SID informado no chamado para conseguir o SQL_ID
+and a.serial in (45693); 
 
 SQL_ID               SID    SERIAL# USERNAME        STATUS   ACTION                                                           MODULE                                                           MACHINE                   SQL_TEXT
 ------------- ---------- ---------- --------------- -------- ---------------------------------------------------------------- ---------------------------------------------------------------- ------------------------- ------------------------------------------------------------
@@ -28,7 +29,7 @@ SQL>                                    ===========
 SET SERVEROUTPUT ON 
 declare stmt_task VARCHAR2(40);
   begin
-    stmt_task := DBMS_SQLTUNE.CREATE_TUNING_TASK(sql_id => 'akp39chz1r8g9', scope => 'comprehensive', time_limit  => 600);
+    stmt_task := DBMS_SQLTUNE.CREATE_TUNING_TASK(sql_id => 'bzss22wz2gcky', scope => 'comprehensive', time_limit  => 600);
     DBMS_OUTPUT.put_line('task_id: ' || stmt_task );
     end;
 /
@@ -36,7 +37,7 @@ declare stmt_task VARCHAR2(40);
                                     3 PASSO
                                     ================
 begin
-DBMS_SQLTUNE.EXECUTE_TUNING_TASK(task_name => 'TASK_201769');
+DBMS_SQLTUNE.EXECUTE_TUNING_TASK(task_name => 'TASK_258083');
 end;
 /
                                     ===================
@@ -46,8 +47,20 @@ set long 999999999
 set lines 190
 col recommendations for a180
 set pages 500
+SELECT DBMS_SQLTUNE.REPORT_TUNING_TASK('TASK_258083') AS recommendations FROM dual;
+
+
+
+set long 999999999
+set lines 190
+col recommendations for a180
+set pages 500
 SELECT DBMS_SQLTUNE.REPORT_TUNING_TASK('') AS recommendations FROM dual;
  Recommendation
   --------------
   - Consider collecting optimizer statistics for this index.
-    execute dbms_stats.gather_index_stats(ownname => 'FDSPPRD', indname =>            'PSTIN_DEMAND', estimate_percent => DBMS_STATS.AUTO_SAMPLE_SIZE);
+
+
+    execute dbms_stats.gather_table_stats(ownname => 'FDSPPRD', tabname =>'PS_DPSP_RED_EU_PND', estimate_percent => DBMS_STATS.AUTO_SAMPLE_SIZE, method_opt => 'FOR ALL COLUMNS SIZE AUTO', cascade => TRUE);
+
+             execute dbms_sqltune.accept_sql_profile(task_name => 'TASK_256569', task_owner => 'SYS', replace => TRUE);

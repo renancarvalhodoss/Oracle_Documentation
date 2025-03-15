@@ -9,9 +9,6 @@ FROM sys.dm_server_services WITH (NOLOCK) OPTION (RECOMPILE);
 
 
 
-
-
-
 -- Status Databases
 
 SELECT @@servername as instance,     
@@ -65,13 +62,3 @@ GROUP BY esc.client_net_address, es.[program_name], es.[host_name], es.login_nam
 ORDER BY [connection count] DESC OPTION (RECOMPILE);
 
 --ORDER BY ec.client_net_address, es.[program_name] OPTION (RECOMPILE);
-
-
-
-
-
-
-
-
-
-

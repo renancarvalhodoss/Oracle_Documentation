@@ -20,4 +20,3 @@ RCLWTNP1  RCLWTNP1       READ WRITE        PRIMARY      07-09-2021 05:34:45 orad
  
  
  select RESOURCE_NAME, CURRENT_UTILIZATION, MAX_UTILIZATION  from v$resource_limit;
-

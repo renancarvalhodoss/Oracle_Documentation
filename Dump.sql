@@ -56,5 +56,3 @@ expdp userid=\"/ as sysdba\"  logfile=estimate_SCRAPSCALE_exp.log DIRECTORY=dump
 
 select count(*) segments,
 round(sum(bytes)/1024/1024/1024,2) size_GB from dba_segments where owner in ('SAPSR3','SCRAPSCALE');
-
-

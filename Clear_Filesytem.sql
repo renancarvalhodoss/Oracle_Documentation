@@ -54,8 +54,8 @@ du -sg * | sort -nr
 	22640	./rdbms/orcl/ORCL
 	23376	.
 
-o	verifique os maiores diretórios e apague os arquivos mais antigos com extensão .aud, .trc e .trm.
-o	Sempre que possível deixe 90 dias de arquivos para facilitar análise de problemas e atender a política de segurança do cliente. 
+-- o	verifique os maiores diretórios e apague os arquivos mais antigos com extensão .aud, .trc e .trm.
+-- o	Sempre que possível deixe 90 dias de arquivos para facilitar análise de problemas e atender a política de segurança do cliente. 
 
 
 
@@ -69,24 +69,19 @@ find . \( -name "*.trm" -a -mtime +10  \) -exec rm -r {} \; &
 find . \( -name "*.aud.gz" -a -mtime +30 \) -exec rm -r {} \; &
 find . \( -name "*.trm" -a -cmin +1 \) -exec rm -r {} \; &
 find . \( -name "*.trc" -a -cmin +1 \) -exec rm -r {} \; &
-find . \( -name "*.xml" -a -cmin +5 \) -exec rm -r {} \; &
-find . \( -name "*.log" -a -mtime +1 \) -exec rm -r {} \; &
-find . -name "*.log" -mtime +104 -exec gzip {} \;
-find . \( -name "*.xml" -a -mtime +1 \) -exec rm -r {} \; &
+find . \( -name "*.aud" -a -cmin +5 \) -exec rm -r {} \; &
+find . \( -name "*.aud" -a -mtime +1 \) -exec rm -r {} \; &
+find . -name "*.trm" -a -mtime +1 -exec gzip {} \;
+find . -name "*.trc" -a -mtime +1 -exec gzip {} \;
+find . \( -name "*.xml" -a -mtime +2 \) -exec rm -r {} \; &
 
 find /u01/app/oracle/admin/ogld01dr/adump \( -name "*.aud" -a -cmin +1 \) -exec rm -r {} \; &
 find /u01/app/oracle/admin \( -name "*.aud" -a -cmin +1 \) -exec rm -r {} \; &
 
 
-alter system switch logifle
-
-set pages 2000
-set lines 2000
-select value from v$diag_info;
-
-
+du -ahx . | sort -rh | head -30
 du -sg * | sort -nr |head -30
-du -g . |sort -n 
+du -g . |sort -n |tail -60
 du -sh * | sort -nr 
 du -h .|sort -n |tail -30
 echo > DBSAPDEV_arc1_57978.trc
@@ -103,13 +98,10 @@ find /u01/app/oracle/admin/DBPSTHST/adump \( -name "*.aud" -a -cmin +1 \) -exec 
 find /u01/app/oracle/admin/DBMSPPRD/adump \( -name "*.aud" -a -cmin +1 \) -exec rm -r {} \; &
 find . \( -name "*.trm" -a -cmin +1 \) -exec rm -r {} \; &
 find . \( -name "*.trc" -a -cmin +1 \) -exec rm -r {} \; &
-find /grid \( -name "*.trc" -a -cmin +1 \) -exec rm -r {} \; &
+find . \( -name "*.xml" -a -cmin +1 \) -exec rm -r {} \; &
 find /grid \( -name "*.trm" -a -cmin +1 \) -exec rm -r {} \; &
-find . \( -name "*.xml" -a -cmin + \) -exec rm -r {} \; &
-
-%Un%!I0*MX8Ot!*acH
+find . \( -name "*.aud" -a -cmin +1 \) -exec rm -r {} \; &
 
 
 gzip -c arquivo.txt > arquivo.txt.gz
 gzip -c listener_sva.log > listener_sva.log_bkp23112024.gz
-

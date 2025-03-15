@@ -1,22 +1,22 @@
 
------------STOP --------------
+# -----------STOP --------------
 
 sudo su - mongousr 
 mongod -f /mongodb/prd/conf/mongod.conf --shutdown 
 
-ou 
+# ou 
 
 sudo su - mongousr 
 /mongodb/prd/scripts/stopReplicaSet.sh 
 
  
 
---------------START -----------
+# --------------START -----------
 
 sudo su - mongousr 
 mongod -f /mongodb/prd/conf/mongod.conf 
 
-ou 
+# ou 
 
 sudo su - mongousr 
 /mongodb/prd/scripts/startReplicaSet.sh 
@@ -26,14 +26,14 @@ sudo su - mongousr
 
 
 
---------------Log do banco--------------- 
+# --------------Log do banco--------------- 
 
 
 drwxr-s---. 2 mongousr mongo  8192 Feb 23 01:05 log 
 
  
 
---------------Scripts --------------------
+# --------------Scripts --------------------
 
 drwxr-s---. 3 mongousr mongo    58 Feb 23 10:22 scripts   
 -rwx------. 1 mongousr mongousr 2845 Feb 21 16:59 mongocheck.sh (checklist basico ) 

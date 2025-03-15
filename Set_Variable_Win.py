@@ -30,6 +30,11 @@ setenv ORACLE_SID <nome-da-instancia>
 setenv ORACLE_HOME <diretório-binario-oracle>
 setenv PATH $ORACLE_HOME/bin:$PATH
 
+
+setenv ORACLE_SID P82
+setenv ORACLE_HOME /oracle/P82/19
+setenv PATH $ORACLE_HOME/bin:$PATH
+
 # Ambiente Windows:
 
 set ORACLE_SID=<nome-da-instancia>
@@ -47,33 +52,3 @@ export PATH=$ORACLE_HOME/bin:$PATH
 
 export ORACLE_SID=PMS
 export ORACLE_HOME=/oracle/PMS/19.0.0
-
-
-
-SELECT PARA HONDA  CHECKPOINT - RESTORE
-
-
-set lin 200 pages 999
-COLUMN osuser FOR A10
-COLUMN username FOR A12
-COLUMN inst_id FOR 99
-COLUMN sid FOR 99999
-COLUMN serial# FOR 999999
-COLUMN spid FOR A6
-COLUMN message FOR A40 WORD_WRAPPED
-
-SELECT s.inst_id, s.SID, s.serial#, p.spid,
-       s.username, s.osuser,
-       l.sql_address, 
-       -- l.sql_id,
-       ROUND((sofar/DECODE(totalwork,0,1,totalwork))*100,2) "% COMPLETED", time_remaining,
-       l.message
-  FROM gv$session_longops l
-  JOIN gv$session s
-    ON (s.inst_id = l.inst_id AND s.SID = l.SID AND s.serial# = l.serial#)
-  JOIN gv$process p
-    ON (p.inst_id = s.inst_id AND p.addr = s.paddr)
-WHERE ROUND((sofar/DECODE(totalwork,0,1,totalwork))*100,2) != 100
-   AND l.time_remaining IS NOT NULL
-   and l.message like '%RMAN%'
-ORDER BY ROUND((sofar/DECODE(totalwork,0,1,totalwork))*100,2) DESC;

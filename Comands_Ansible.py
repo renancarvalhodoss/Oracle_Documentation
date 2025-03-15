@@ -18,7 +18,6 @@ ansible_password=root
 host_key_checking = false   -------discoment
 
 
-
 #test conection
 ansible distros -m ping
 
@@ -53,15 +52,3 @@ ansible distros -a "[comand]"
 
     #   execute playbook
     ansible-playbook playbook.yml
-dqm@24vncdqm@24vnc
-
-    SAHSADPORA003
-hda0421,sahsadpora003
-SAHSADPORA003
-[22/09/2023 00:39] Lucas Nunes Queiroz
-ssh root@unxorasp100
- ssh oracle@172.16.81.12
-10.111.134.101
-oracle@unxorasp100
-lc5735240@172.16.84.67
-g00d2talk4MYSEL#

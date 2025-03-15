@@ -33,33 +33,33 @@ ARCH.THREAD# = APPL.THREAD#;
 
 
 
-select thread#,max(primary) primary, max(transf) transf,
-       max(standby) standby, MAX(primary)-MAX(transf) transf_gap, MAX(primary)-MAX(standby) apply_gap,
-       max(timegap) hoursgap
-from (
-SELECT thread#,max(sequence#) primary, 0 transf, 0 standby, 0 timegap
-     FROM v$archived_log
-    WHERE archived = 'YES'
-      AND resetlogs_change# = ( select d.resetlogs_change# from v$database d )
-GROUP BY thread#
-union all
-SELECT thread#,0 primary, max(sequence#) transf, 0 standby, 0 timegap
-     FROM v$archived_log
-    WHERE STANDBY_DEST='YES'
-      and archived = 'YES'
-      AND resetlogs_change# = ( select d.resetlogs_change# from v$database d )
-GROUP BY thread#
-union all
-SELECT thread#,0 primary, 0 transf, max(sequence#) standby, trunc((sysdate-max(FIRST_TIME))*24) timegap
-     FROM v$archived_log
-    WHERE STANDBY_DEST='YES'
-      and applied = 'YES'
-      AND resetlogs_change# = ( select d.resetlogs_change# from v$database d )
-GROUP BY thread#
-) asd
-group by thread#
-order by 1
-/
+  select thread#,max(primary) primary, max(transf) transf,
+        max(standby) standby, MAX(primary)-MAX(transf) transf_gap, MAX(primary)-MAX(standby) apply_gap,
+        max(timegap) hoursgap
+  from (
+  SELECT thread#,max(sequence#) primary, 0 transf, 0 standby, 0 timegap
+      FROM v$archived_log
+      WHERE archived = 'YES'
+        AND resetlogs_change# = ( select d.resetlogs_change# from v$database d )
+  GROUP BY thread#
+  union all
+  SELECT thread#,0 primary, max(sequence#) transf, 0 standby, 0 timegap
+      FROM v$archived_log
+      WHERE STANDBY_DEST='YES'
+        and archived = 'YES'
+        AND resetlogs_change# = ( select d.resetlogs_change# from v$database d )
+  GROUP BY thread#
+  union all
+  SELECT thread#,0 primary, 0 transf, max(sequence#) standby, trunc((sysdate-max(FIRST_TIME))*24) timegap
+      FROM v$archived_log
+      WHERE STANDBY_DEST='YES'
+        and applied = 'YES'
+        AND resetlogs_change# = ( select d.resetlogs_change# from v$database d )
+  GROUP BY thread#
+  ) asd
+  group by thread#
+  order by 1
+  /
 
 
 

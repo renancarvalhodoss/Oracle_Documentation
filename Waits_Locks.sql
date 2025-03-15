@@ -6,11 +6,41 @@ select w.sid,s.username, w.event, w.state, w.wait_time, w.seconds_in_wait
 from gv$session_wait w, gv$session s
 where s.sid=w.sid and s.status='ACTIVE'
 and w.seconds_in_wait > 0
-and w.sid in (1435)
+and w.sid in (1687)
 and s.username != 'unknown'
 and s.type     != 'background'
 and s.osuser   != 'oracle'
 order by 4, 5;
+
+set lines 400
+COL USERNAME FOR A15
+COL EVENT FOR A25
+COL STATE FOR A18
+
+SELECT 
+    w.sid, 
+    s.username, 
+    w.event, 
+    w.state, 
+    w.wait_time, 
+    w.seconds_in_wait
+FROM 
+    gv$session_wait w
+JOIN 
+    gv$session s ON s.sid = w.sid
+WHERE 
+    s.status = 'ACTIVE'
+    AND w.seconds_in_wait > 0
+    AND w.sid IN (4404)
+    AND s.username IS NOT NULL
+    AND s.username != 'UNKNOWN'
+    AND s.type != 'BACKGROUND'
+    AND s.osuser != 'oracle'
+ORDER BY 
+    w.state, w.wait_time;
+
+
+alter system kill session '3025,9173' immediate;
 
 ---Locks
 set linesize 1000
@@ -29,10 +59,17 @@ WHERE   A.BLOCK     = 1
  AND A.ID2       = B.ID2;
 
 
+SELECT sql_text 
+FROM gv$sql 
+WHERE sql_id = (SELECT sql_id FROM gv$session WHERE sid = 3334);
+
+SELECT sid, serial#
+FROM v$session
+WHERE sid = 3025;
 
  -----------waits free
 set linesize 1000
-col USERNAME for a15
+col USERNAME for a20
 col EVENT for a50
 col STATE for a10
  select w.sid,s.username, w.event, w.state, w.wait_time, w.seconds_in_wait
@@ -49,7 +86,7 @@ col STATE for a10
  select w.sid,s.username, w.event, w.state, w.wait_time, w.seconds_in_wait
 from gv$session_wait w, gv$session s
 where s.sid=w.sid and s.status='ACTIVE'
-and s.username = 'REFCENT_USER'
+and s.username = 'FDSPPRD'
 and s.type     != 'background'
 and s.osuser   != 'oracle'
 order by 4, 5;
@@ -69,7 +106,7 @@ from
    v$session;
 where
    type ='BACKGROUND'
-   and username != 'unknown'
+   and username != 'unknown';
    and SID ='2276';
 
 
@@ -163,14 +200,14 @@ select
 'EVENT........................................: '||EVENT,
 'EVENT#.......................................: '||EVENT#,
 'PREV_SQL_ID..................................: '||PREV_SQL_ID
-from gv$session where SID = '1435';
+from gv$session where SID = '3025';
 
 
 
 
 
 
-set LINES 1500
+set LINES 99999
 set pages 600
 
 prompt ==================================
@@ -345,7 +382,7 @@ select distincts, id from v$mystat;
 
 set lines 2000
 col object_name format a45
-select owner, object_name, object_type, status from dba_objects where object_name = 'STG_OFERTA_REL_ITEM';
+select owner, object_name, object_type, status from dba_objects where object_name LIKE '%JOB_TRS_VENDA_PAGTO_SANG_';
 
 
 set verify off
@@ -380,24 +417,24 @@ select
 'EVENT........................................: '||EVENT,
 'EVENT#.......................................: '||EVENT#,
 'PREV_SQL_ID..................................: '||PREV_SQL_ID
-from gv$session where sid = '1192';
+from gv$session where sid = '27';
 547,5588  
 set lines 2000
 set pages 2000
-select SQL_ID, LAST_ACTIVE_TIME, EXECUTIONS, OBJECT_STATUS from v$sql; where SQL_TEXT LIKE '%STG_OFERTA_REL_ITEM%' ;
+select SQL_ID, LAST_ACTIVE_TIME, EXECUTIONS, OBJECT_STATUS from v$sql where SQL_ID LIKE '00tdcmq1h75ks' ;
 
 select OWNER,OBJECT_NAME,PROCEDURE_NAME,OBJECT_ID
  from all_procedures
- where  OBJECT_NAME like '%STG_OFERTA_REL_ITEM%';
+ where  OBJECT_NAME like '%JOB_TRS_VENDA_PAGTO_SANG_%';
 
  SELECT 
     object_name
 FROM 
     user_procedures
 WHERE
-    object_type like '%SP_JOB_TRS_VENDA_PAGTO_SANG%';
+    object_type like '%JOB_TRS_VENDA_PAGTO_SANG_%';
 
-Select TEXT
+Select NAME
 From USER_SOURCE;
 Where NAME LIKE '%VENDA%'
 Order by LINE;
@@ -405,13 +442,30 @@ Order by LINE;
 
 set lines 2000
 set pages 2000
-select SQL_ID, LAST_ACTIVE_TIME, SQL_TEXT, EXECUTIONS, OBJECT_STATUS from v$sql where SQL_ID = '99pk53nqa027r' ;
+select SQL_ID, LAST_ACTIVE_TIME, SQL_TEXT, EXECUTIONS, OBJECT_STATUS from v$sql where SQL_ID = '00tdcmq1h75ks' ;
 
 set lines 1000
 set pages 100
+col username format a10
+col machine format a10
+SELECT 
+    sid AS session_id, 
+    serial#, 
+    sql_id, 
+    status, 
+    username, 
+    machine, 
+    program
+FROM 
+    v$session
+WHERE 
+    sql_id = '4a840xg9sqwgx'
+    AND sid = 126;
+
+
 col sql_id for a20
 select  RUNTIME_MEM, PLSQL_EXEC_TIME, CONCURRENCY_WAIT_TIME, APPLICATION_WAIT_TIME 
-from v$sql where SQL_ID = '99pk53nqa027r'; and   sid in (select blocking_session from gv$session);
+from v$sql where SQL_ID = '00tdcmq1h75ks'; and   sid in (select blocking_session from gv$session);
 
 
 set verify off
@@ -446,7 +500,7 @@ select
 'EVENT........................................: '||EVENT,
 'EVENT#.......................................: '||EVENT#,
 'PREV_SQL_ID..................................: '||PREV_SQL_ID
-from gv$session where SQL_ID = '99pk53nqa027r';
+from gv$session where SQL_ID = '4a840xg9sqwgx';
 
 
 
@@ -467,17 +521,17 @@ SPC.NAME,
 SPC.VALUE_STRING,
 LAST_CAPTURED
 FROM V$SQL_BIND_CAPTURE SPC, V$SESSION S,V$SQL SQ
-WHERE  SQ.SQL_ID = '99pk53nqa027r'
+WHERE  SQ.SQL_ID = '83cyyksxy88p6'
 AND S.STATUS='ACTIVE';
 
-select  object_status, first_load_time, username,spid   from v$process ses, v$sql sql where sql.sql_id = '99pk53nqa027r' ;
+select  object_status, first_load_time, username,spid   from v$process ses, v$sql sql where sql.sql_id = '83cyyksxy88p6' ;
 
 select sid from gv$session where SQL_ID = '99pk53nqa027r';
 select sid, sql_id from gv$session where status = 'ACTIVE';
 
 SELECT sql_fulltext
 FROM v$sql
-WHERE sql_id = '99pk53nqa027r';
+WHERE sql_id = 'akp39chz1r8g9';
 
 
 
@@ -692,3 +746,121 @@ group by module
 order by 2 desc;
 
 
+
+
+
+
+
+
+SELECT 
+    s.sid,
+    s.serial#,
+    s.username,
+    s.status,
+    s.osuser,
+    w.event,
+    w.wait_time,
+    w.seconds_in_wait,
+    w.state
+FROM 
+    v$session s
+JOIN 
+    v$session_wait w ON s.sid = w.sid
+WHERE 
+    s.status = 'ACTIVE'
+ORDER BY 
+    w.seconds_in_wait ASC;
+
+
+
+SET LINESIZE 500
+SET PAGESIZE 1000
+COLUMN wait_event FORMAT A5
+SELECT 
+    s.sid,
+    s.serial#,
+    s.username,
+    s.status,
+    --s.osuser,
+    s.program,
+    w.event AS wait_event,
+    w.seconds_in_wait AS wait_seconds
+FROM 
+    v$session s
+JOIN 
+    v$session_wait w ON s.sid = w.sid
+WHERE 
+    s.status = 'ACTIVE'
+    AND w.event IS NOT NULL
+ORDER BY 
+    w.seconds_in_wait ASC;
+
+
+
+
+SELECT 
+    task_id, 
+    task_name, 
+    status, 
+    start_time, 
+    end_time
+FROM 
+    dba_advisor_executions;
+WHERE 
+    task_name LIKE 'STA_TAREFA_%' 
+    AND task_id = '459367_4A840XG9SQWGX';  -- Substitua com o ID correto da sua tarefa
+
+
+
+SET LINESIZE 500
+SET PAGESIZE 1000
+col sql_text format a20
+SELECT 
+    sql_id,
+    sql_text,
+    elapsed_time / 1000000 AS elapsed_time_seconds,
+    cpu_time / 1000000 AS cpu_time_seconds
+FROM 
+    v$sql
+WHERE 
+    sql_id ='8996brkwwtb8n';
+
+
+SET LINESIZE 500
+SET PAGESIZE 1000
+    SELECT 
+    job_name, 
+    session_id, 
+    running_instance, 
+    start_date,
+    status
+FROM 
+    dba_scheduler_running_jobs
+WHERE 
+    sql_id = '8996brkwwtb8n';  -- Substitua pelo sql_id da tarefa do advisor
+
+    SELECT 
+    job_name,
+    running_instance,
+    session_id,
+    owner,
+    --SYSDATE - start_date AS duration_in_days,
+    --ROUND((SYSDATE - start_date) * 24 * 60, 2) AS duration_minutes
+FROM 
+    dba_scheduler_running_jobs
+WHERE 
+    job_name LIKE '%JOB_TRS_VENDA_PAGTO_SANG_%';
+ORDER BY 
+    duration_in_days DESC;
+
+
+SELECT 
+    job_name,
+    session_id,
+    running_instance,
+    start_date,
+    status
+FROM 
+    dba_scheduler_running_jobs;
+WHERE 
+    session_id = <session_id>;  -- Substitua <session_id> pelo valor específico

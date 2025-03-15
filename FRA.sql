@@ -31,7 +31,7 @@ select * from V$FLASH_RECOVERY_AREA_USAGE;
 -- CHECK USED FRA SPACE
 set pages 2000
 set lines 2000
-col name format a15
+col name format a25
 clear breaks
 clear computes 
 set lines 280
@@ -68,13 +68,18 @@ ALTER SYSTEM SET DB_RECOVERY_FILE_DEST='+GROBSMP_DATA' SCOPE=BOTH;
 ALTER SYSTEM SET LOG_ARCHIVE_DEST_STATE_1='ENABLE' SCOPE=BOTH;
 
 -- ALTER FRA SIZE
-ALTER system  SET db_recovery_file_dest_size=128000M  scope=BOTH ;  
+ALTER system  SET db_recovery_file_dest_size=200G  scope=BOTH ;  
 
 NAME       SIZE_MB    USED_MB   PCT_USED
 ------- ---------- ---------- ----------
 +FRA        716800     701339         98
 
 
+-- verificar retencao do flashback
+ SHOW PARAMETER DB_FLASHBACK_RETENTION_TARGET;
+
+ALTER SYSTEM SET DB_FLASHBACK_RETENTION_TARGET = 60;
+SQL> ALTER SESSION SET CONTAINER = CDB$ROOT;
 
 
 set linesize 121

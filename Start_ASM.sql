@@ -18,8 +18,6 @@ chown oracle:dba /dev/mapper/DISK_ASM02 ; chown oracle:dba /dev/mapper/DISK_ASM0
 
 
 
-
-
 set pagesize 2000
 set linesize 2000
 col PATH format a30

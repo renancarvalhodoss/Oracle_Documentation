@@ -15,7 +15,8 @@ oracle
 grid
 sudo su - oracle
 show pdbs;
-alter session set container=FREEPDB1;
+alter session set container=SGPDV;
 Summary: The percentage free to allocated of IFW_DT_TBS that has 5384.06 MB is 12.37% on RZ:HOM1291-EXACC-pda-htlxnd:RDB, InstanceName: CDBHOM021. Threshold Formula: Used_Size_MB<250000.00 AND Percentage_Free_To_Allocated>7.00 AND Percentage_Free_To_Allocated<14.0
 ResourceId: htlxnddbpr010a
 
+show parameter utl_file_dir;

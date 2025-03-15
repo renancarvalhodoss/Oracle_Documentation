@@ -1,12 +1,10 @@
-**ACHAR O OWNER DA PROCEDURE
+-- **ACHAR O OWNER DA PROCEDURE
 
 select OWNER, OBJECT_TYPE, OBJECT_NAME from dba_objects where OBJECT_NAME = 'SP_DSP_BUSCA_DADOS_ARQ_P1';
 
 
 
-
-
-**VER A PROCEDURE
+-- **VER A PROCEDURE
 
 
 Set lines 210
@@ -22,6 +20,3 @@ spool nomequevcquiser.log
 
 
 spool off
-
-
-

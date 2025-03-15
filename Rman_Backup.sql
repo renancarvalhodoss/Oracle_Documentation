@@ -81,19 +81,3 @@ run {
 	allocate channel c1 device type disk;
 	backup as compressed backupset 	format '/backup/orcl/fisico/FULL_%T_%d_%s_%p' (database  include current controlfile) ; 
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

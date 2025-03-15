@@ -5,7 +5,59 @@ select  SESSION_KEY, INPUT_TYPE, STATUS, OUTPUT_DEVICE_TYPE,to_char(START_TIME,'
 from V$RMAN_BACKUP_JOB_DETAILS 
 order by session_key;
 
+set pages 200
+set lines 900
+COLUMN sid FORMAT 99999
+COLUMN serial# FORMAT 999999
+COLUMN username FORMAT A15
+COLUMN status FORMAT A10
+COLUMN program FORMAT A20
+COLUMN module FORMAT A20
+-- COLUMN action FORMAT A30
+COLUMN logon_time FORMAT A15
+COLUMN sql_id FORMAT A15
+COLUMN prev_sql_id FORMAT A15
+SELECT 
+    sid, 
+    serial#, 
+    username, 
+    status, 
+    program, 
+    module, 
+    -- action, 
+    logon_time, 
+    sql_id, 
+    prev_sql_id
+FROM 
+    v$session 
+WHERE 
+    sql_id IN (
+        SELECT 
+            sql_id 
+        FROM 
+            v$sql 
+        WHERE 
+            sql_text LIKE '%+FRA/MESSAHP1_STB/ARCHIVELOG/2025_02_15/thread_1_seq_14454.887.1193173163%'
+    )
+ORDER BY 
+    logon_time DESC;
 
+
+    SELECT sql_id, sql_text
+FROM v$sql
+WHERE sql_id = '2h5zd97ttdaq4';
+
+
+
+
+set pages 200
+set lines 900
+COLUMN sid FORMAT 99999
+COLUMN serial# FORMAT 999999
+SELECT sid, serial#, opname, sofar, totalwork, 
+       ROUND(sofar/totalwork*100, 2) AS progress
+FROM v$session_longops;
+WHERE sid = 3776;
 
  set lines 200
  alter session set nls_date_format = 'dd/mm/yyyy hh24:mi:ss';
@@ -31,6 +83,9 @@ from V$RMAN_BACKUP_JOB_DETAILS;
 while sleep 60;
 do jobs
 done
+
+while sleep 60; do jobs; done
+
 
 SELECT SID, SERIAL#, CONTEXT, SOFAR, TOTALWORK,OPNAME,
 ROUND (SOFAR/TOTALWORK*100, 2) "% COMPLETE"
@@ -70,8 +125,30 @@ hotsm001mul event standard weekly_backup node=goodell enddate=today+7
 query event nodes=joe domain2 standard begindate=02/26/2002 enddate=02/27/2002 format=detailed
 query event standard SP1FRHODB201_CORAD_PRM02_RST node=sp1frhodb202
 
+set pagesize 500
+set lines 200
+col JOB_NAME for a30
+col DESTINATION for a30
+col OWNER for a30
+select job_name,DESTINATION,RUNNING_INSTANCE,SESSION_ID,OWNER from dba_scheduler_running_jobs where job_name like '%JOB_TRS_VENDA_PAGTO_SANG_%';
 
-select * from dba_scheduler_running_jobs; where job_name like '%Rman%';
+
+SELECT 
+    job_name,
+    log_date,
+    status,
+    additional_info
+FROM 
+    dba_scheduler_job_log
+WHERE 
+    job_name LIKE 'JOB_TRS_VENDA_PAGTO_SANG_%'
+     AND trunc(log_date) = trunc(SYSDATE)
+     AND status = 'SUCCEEDED'
+ORDER BY 
+    log_date ASC;
+
+
+
 
 SELECT  to_char(round(sysdate-nvl(MAX(rd.start_time),sysdate-10000)))
             FROM   v$rman_backup_job_details RD,v$backup_set_details SD
@@ -84,6 +161,7 @@ SELECT  to_char(round(sysdate-nvl(MAX(rd.start_time),sysdate-10000)))
 ------------------verifica backups em execucao-------------------------------------
 set line 999
 set pages 0
+
 SELECT  SESSION_KEY, INPUT_TYPE, STATUS,COMMAND_ID,
        TO_CHAR(START_TIME,'dd/mm/yy hh24:mi') start_time,
        TO_CHAR(END_TIME,'dd/mm/yy hh24:mi')   end_time,
@@ -128,7 +206,7 @@ select 'alter system kill session '''||sid||','||serial#||''' immediate;' from v
 SQL> select CAPTURE_NAME, CAPTURE_TYPE, STATUS from DBA_CAPTURE;
 
 
-alter system kill session '607,19985' immediate;
+alter system kill session '3892,59469' immediate;
 alter system kill session '613,23112' immediate;
 
 
@@ -206,3 +284,39 @@ ORDER BY ROUND((sofar/DECODE(totalwork,0,1,totalwork))*100,2) DESC;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+SELECT 
+    job_name,
+    running_instance,
+    session_id,
+    owner,
+    SYSDATE - start_date AS duration_in_days,
+    ROUND((SYSDATE - start_date) * 24 * 60, 2) AS duration_minutes
+FROM 
+    dba_scheduler_running_jobs
+WHERE 
+    job_name LIKE '%JOB_TRS_VENDA_PAGTO_SANG_%'
+ORDER BY 
+    duration_in_days DESC;
+
+ALTER SYSTEM KILL SESSION '1490, 46283';
+
+
+
+
+SELECT status_integracao, count(1)
+FROM dbcsi_dsp.transacao_p2k
+WHERE TRUNC(data_transacao) = TRUNC(SYSDATE) 
+  AND status_integracao IN ('PR', 'NP')
+GROUP BY status_integracao
+ORDER BY status_integracao;

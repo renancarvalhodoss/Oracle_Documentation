@@ -12,10 +12,8 @@ SELECT SNAP_ID, BEGIN_INTERVAL_TIME, END_INTERVAL_TIME
 FROM DBA_HIST_SNAPSHOT
 ORDER BY SNAP_ID;
 -- Anote os IDs dos snapshots que você deseja comparar.
-132815    133652
-133653    133750
-87602    87604
-133535  133583
+73155
+ 73157
 -- 3. Executar o Relatório AWR
 -- Para gerar o relatório, execute o script localizado no diretório $ORACLE_HOME/rdbms/admin. O script mais usado é o awrrpt.sql. Siga este processo:
 

@@ -1,3 +1,5 @@
+EXEC DBMS_STATS.GATHER_DATABASE_STATS; ---(FULL)
+
 
 BEGIN
   DBMS_STATS.GATHER_TABLE_STATS(
@@ -123,8 +125,10 @@ col COLUMN_NAME for a30
 --col NUM_BUCKETS for a40
 col HISTOGRAM for a20
 select OWNER,TABLE_NAME,COLUMN_NAME,DENSITY,NUM_BUCKETS,HISTOGRAM,to_char(LAST_ANALYZED,'DD-MM-YYYY HH24:MI:SS') 
-from dba_tab_col_statistics 
-where OWNER = 'FDSPPRD'
+from dba_tab_col_statistics
+where OWNER = 'SAPSR3'
+ORDER BY LAST_ANALYZED DESC
+FETCH FIRST 50 ROWS ONLY;
 and  TABLE_NAME = 'PS_BUS_UNIT_TBL_FS'
 or  TABLE_NAME = 'PS_LOCATION_TBL'
 or  TABLE_NAME = 'PS_DPSP_LIN_RET_DV'
@@ -145,9 +149,24 @@ select SID,
        EVENT,
        --TIME_REMAINING_MICRO,
        TIME_SINCE_LAST_WAIT_MICRO
-from V$SESSION;
-where sid = 4482;
+from V$SESSION
+where sid = 401;
 
+
+-----------------verifica statiscs coletada na data atual----------
+SELECT 
+    owner, 
+    table_name, 
+    column_name, 
+    to_char(last_analyzed, 'DD-MM-YYYY HH24:MI:SS') AS last_analyzed
+FROM 
+    dba_tab_col_statistics 
+WHERE 
+    last_analyzed IS NOT NULL
+    AND trunc(last_analyzed) != trunc(SYSDATE)
+    AND owner = 'SAPSR3'
+ORDER BY 
+last_analyzed ASC;
 -------------- verificar longa execucao------------------
 
 set pagesize 1000
@@ -200,3 +219,74 @@ SELECT segment_name,
  WHERE owner = 'FDSPPRD'
    AND segment_name = 'PS_NF_HDR_BBL_FS'
  GROUP BY segment_name;
+
+
+
+
+ DECLARE
+    start_time  NUMBER;
+    end_time    NUMBER;
+    elapsed_time NUMBER;
+BEGIN
+    -- Captura o tempo de início
+    start_time := DBMS_UTILITY.GET_TIME;
+    
+    -- Executa o procedimento DBMS_STATS
+    EXEC DBMS_STATS.GATHER_DATABASE_STATS;
+    
+    -- Captura o tempo de término
+    end_time := DBMS_UTILITY.GET_TIME;
+    
+    -- Calcula o tempo de execução
+    elapsed_time := end_time - start_time;
+    
+    -- Exibe o tempo de execução em segundos
+    DBMS_OUTPUT.PUT_LINE('Tempo de execução: ' || elapsed_time / 100);
+END;
+/
+
+
+set pagesize 1000
+set linesize 1000
+col sql_text_EXCERPT format a50
+SELECT 
+    sql_id, 
+    DBMS_LOB.SUBSTR(sql_text, 1000, 1) AS sql_text_excerpt, 
+    TO_CHAR(elapsed_time / 1000000, '999,999,999') AS elapsed_time_seconds,
+    TO_CHAR(cpu_time / 1000000, '999,999,999') AS cpu_time_seconds
+FROM 
+    v$sql
+WHERE 
+    sql_text LIKE '%CLIENTE_VENDA%' 
+    AND sql_text IS NOT NULL
+ORDER BY 
+    elapsed_time DESC;
+
+
+SELECT 
+    owner, 
+    table_name, 
+    column_name, 
+    to_char(last_analyzed, 'DD-MM-YYYY HH24:MI:SS') 
+FROM 
+    dba_tab_col_statistics 
+WHERE 
+    last_analyzed IS NOT NULL
+    AND owner = 'SAPSR3'
+ORDER BY 
+    last_analyzed DESC;
+
+
+  
+
+set pagesize 1000
+set linesize 1000
+col username format a10
+    SELECT sid, serial#, username, status, sql_id, sql_child_number
+FROM v$session
+WHERE sql_id IN (
+    SELECT sql_id
+    FROM v$sql
+    WHERE sql_text LIKE '%GATHER_DATABASE_STATS%'  -- Filtra para o processo de estatísticas
+)
+ORDER BY sid;

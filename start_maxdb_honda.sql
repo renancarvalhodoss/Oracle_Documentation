@@ -1,5 +1,5 @@
-Login: 
-Logar como soadm1,soadm2 ou soadm3
+-- Login: 
+-- Logar como soadm1,soadm2 ou soadm3
 
 Start: 
 sudo su - sdb 
@@ -11,44 +11,27 @@ db_state -v
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 sudo su - sdb 
 
-logar no banco: 
+-- logar no banco: 
 dbmcli -d ${SID} -u superdba,F1t@C1ty 
 
-Checar status no banco: 
+-- Checar status no banco: 
 info state 
 
-filesystem com checklist do banco:
-Executar o script abaixo: 
+-- filesystem com checklist do banco:
+-- Executar o script abaixo: 
 /home/sdb/ibm_maxdb_checklist.sh
 
-Verificar as logs:
+-- Verificar as logs:
 /home/sdb/ibm_maxdb_checklist.log
 
 
 
 
 
-
-
-
-
-
-
-Login: 
-Logar como soadm1,soadm2 ou soadm3
+-- Login: 
+-- Logar como soadm1,soadm2 ou soadm3
 
 Stop: 
 sudo su - sdb 

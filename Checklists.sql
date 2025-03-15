@@ -32,6 +32,11 @@ alter system set control_files='+DG_P2K_DATA/dbdhprod/control01.ctl' scope=spfil
 UNXORADR100
 set lines 200;
 select open_mode,database_role, dataguard_broker, SWITCHOVER_STATUS,guard_status,flashback_on from v$database;
+f#jbWWNGw8HZHZJX
+
+
+
+
 
 -----------------------------checklist-------------------------------------
 alter system checkpoint;
@@ -48,16 +53,7 @@ alter system switch logfile;
 prompt pdbs OK-> RESTRICTED=NO, OPEN_MODE=READ ONLY(PDB$SEED) e READ WRITE (demais bancos)
 show pdbs
 
-iDNnTF2ZfO&7VkZL1u
-dtqcd3Pr@kU0cZj
 
-
-
-
-
-
-z1!ZY^z(50a((KC
-not spooling currently
 
 set lin 200 pages 999
 col comp_name for a50
@@ -92,8 +88,15 @@ adrci> show homes
 ADR Homes:
 diag/rdbms/orcl/ORCL
 
-juntar os dois caminhos + trace
+-- juntar os dois caminhos + trace
 /oracle/EWD/saptrace/diag/rdbms/ewd/EWD
+
+
+alter system switch logifle
+
+set pages 2000
+set lines 2000
+select value from v$diag_info;
 
 
 -----------------------------------------check listener-----------------------------------------
@@ -119,94 +122,10 @@ Ultimos backups executados
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-col name for a60;
-select * from v$tablespace
-where flashback_on != 'YES';
-
-col name for a60;
-select ts#,file#,name,status,bytes from v$datafile;
-
-
-
-
-[2:27 AM] Debora Rossi
-U.qF+1-Hj693Zjz
-
-
-ALTER SESSION SET NLS_DATE_FORMAT = 'dd/mm/yyyy hh24:mi:ss';
-UPDATE fdspprd.ps_in_demand SET IN_FULFILL_STATE = 90
-WHERE BUSINESS_UNIT IN ('VD909')
-AND IN_FULFILL_STATE = '30'
-AND DEMAND_DATE  <= '18/01/2023';
-COMMIT;
-
-
-
-
-
 D:\usr\sap\NFP\SYS\exe\uc\NTAMD64\brspace.exe  -u / -c force -f tbreorg -t J*,K*,R* -parallel 5 -degree 5  -c ctablobind
 
 
-
-root@hoapp006ceb /oracle/FIQ/stage $ su - oracle
-oracle@hoapp006ceb /oracle/FIQ $ cd /oracle/FIQ/stage
-oracle@hoapp006ceb /oracle/FIQ/stage $ export IHRDBMS=/oracle/FIQ/19.0.0
-oracle@hoapp006ceb /oracle/FIQ/stage $ export OHRDBMS=/oracle/FIQ/19
-
-export IHRDBMS=/oracle/SEQ/19.0.0 && echo $IHRDBMS
-export OHRDBMS=/oracle/SEQ/19 && echo $OHRDBMS 
-export OHGRID=/oracle/GRID/19.0.0 && echo $OHGRID
-
-/oracle/SEQ/19.20.0/OraPatch
 set lin 200 pages 999 col
 host_name for a25
 select instance_name, host_name, status, to_char(sysdate,'dd-mm-yyyy hh24:mi:ss') as
 CURDATE, to_char(startup_time,'dd-mm-yyyy hh24:mi:ss') as startup_ime from v$instance; 
-
-$OHGRID/bin/srvctl status nodeapps
-roothas.sh -prepatch
-oracle@hoapp007ceb /home/oracle $ ps -ef| grep tns
-  oracle  8388954        1   3   Jun 23      -  1:44 /oracle/SEQ/19.0.0/bin/tnslsnr LISTENER_SEQ -inherit
-  oracle 51839234 49479962   0 06:23:52  pts/0  0:00 grep tns
-oracle@hoapp007ceb /home/oracle $ lsnrctl stop LISTENER_SEQ
-
-$OHGRID/bin/cluu`l \ -ckpt -oraclebase `env ORACLE_HOME=$OHGRID $OHGRID/bin/orabase` \ -writeckpt -name ROOTCRS_PREPATCH -state START
-
-SELECT username, account_status, FROM dba_users
-WHERE username IN ('ANONYMOUS', 'APEX_PUBLIC_USER', 'DBSNMP', 'OUTLN', 'SYSTEM', 'SYS', 'HR', 'SCOTT')
-AND account_status = 'OPEN';
-
-SET SERVEROUTPUT ON
-BEGIN
-    FOR c IN (SELECT username FROM dba_users) LOOP
-        BEGIN
-            EXECUTE IMMEDIATE 'ALTER USER ' || c.username || ' IDENTIFIED BY values (''new_password'')';
-            DBMS_OUTPUT.PUT_LINE('User ' || c.username || ' has default password!');
-        EXCEPTION
-            WHEN OTHERS THEN
-                NULL; -- A senha não é padrão se der erro
-        END;
-    END LOOP;
-END;
-/
-
-set linesize 100
-set pages 999
-col username for a10
-SELECT username, account_status FROM dba_users;
-c8^AL(xbmy)2XJm
-
-
-
-

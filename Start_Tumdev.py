@@ -1,9 +1,9 @@
-DBA
-==== 
-Servidor  Linux TUMDEV01 => 10.202.228.133
-======================
+# DBA
+# ==== 
+# Servidor  Linux TUMDEV01 => 10.202.228.133
+# ======================
 
-Com usuario abaixo e executar os scripts/comando para subir os bancos e adminserver :
+# Com usuario abaixo e executar os scripts/comando para subir os bancos e adminserver :
 
  
 

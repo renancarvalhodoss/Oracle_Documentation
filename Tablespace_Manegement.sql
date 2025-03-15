@@ -2,13 +2,14 @@
 
  set linesize 1000
  set pagesize 1000
+ set colsep "|"
  set trimspool on
  col free format 999999990.00
  col used format 999999990.00
  col megas format 999999990.00
  col PCT_USED format 99.00
- COL NAME FORMAT A17
- col banco format a30
+ COL NAME FORMAT A15
+ col banco format a22
 
  select i.host_name || '-'|| i.instance_name banco,nvl(b.tablespace_name,nvl(a.tablespace_name,'UNKOWN')) name,
        mbytes_alloc megas,
@@ -22,12 +23,34 @@
   where a.tablespace_name (+) = b.tablespace_name and
         c.tablespace_name (+) = b.tablespace_name
 --and   trunc(((mbytes_alloc-nvl(mbytes_free,0))/mbytes_alloc)*100,2) >80
-AND  b.tablespace_name='EAI_DADOS_1024K'
+ AND  b.tablespace_name='TBS_AUDIT'
    order by 6 asc;
 
 
+SET LINESIZE 200  -- Aumenta a largura da linha
+SET PAGESIZE 50   -- Define o número de linhas por página de resultados
+
+COLUMN "Size (GB)" FORMAT 9999999.99  -- Ajusta a coluna para exibir até 7 dígitos antes do ponto e 2 casas decimais
+COLUMN owner FORMAT a20
+COLUMN table_name FORMAT a30 
+SELECT 
+    t.owner,
+    t.table_name,
+    ROUND(SUM(s.bytes) / 1024 / 1024 / 1024, 2) AS "Size (GB)"
+FROM dba_tables t
+JOIN dba_segments s
+    ON t.owner = s.owner
+    AND t.table_name = s.segment_name
+GROUP BY t.owner, t.table_name
+HAVING SUM(s.bytes) / 1024 / 1024 / 1024 > 1  -- Apenas tabelas maiores que 1 GB
+ORDER BY "Size (GB)" DESC
+FETCH FIRST 10 ROWS ONLY;
 
 
+
+
+
+PSAPSR3740X
 SET LINESIZE 1000
 SET PAGESIZE 100
 COLUMN tablespace_name FORMAT A10
@@ -79,14 +102,18 @@ chr(39)||d.file_name||chr(39) file_name
 FROM dba_data_files D,v$datafile v WHERE d.file_id=v.file#
 --and d.bytes/1024/1024 < 32767
 and d.tablespace_name in ('&TBS') 
---and FILE_NAME LIKE '%/oracle/PYE/sapdata15/sr3.data79/data79%'
+--and FILE_NAME LIKE '%J:%'
 ORDER BY v.CREATION_TIME;
 
+
+
+-- verifica espaco livre por dbf
 set pages 1000
-            set lines 300
+set colsep '|'
+            set lines 350
             set trims on
             col tablespace_name format a30   TRUNC word_wrapped   heading "Tabsp Name"
-            col file_name       format a50   TRUNC  word_wrapped  heading "File Name"
+            col file_name       format a60   TRUNC  word_wrapped  heading "File Name"
             col total_size      format 999,999,999     heading "Size Mb"
             col free_space      format 999.999,999     heading "Free Mb"
             col pct_used        format 999.00         heading "%|Used"
@@ -107,9 +134,27 @@ set pages 1000
             ,       dba_data_files        df
             where df.file_id = fr.file_id(+)
                  and tablespace_name = '&1'
+               --   and nvl(fr.bytes/1024/1024,0) >= 10000
             order by free_space ASC
             /
-EAIQAS
+
+
+----verificar mostra a quantidade de savings por df
+            SELECT      FILE_NAME,
+                          ceil( (nvl(hwm,1)*t.block_size)/1024/1024 ) smallest,
+                          ceil( blocks*t.block_size/1024/1024) currsize,
+                          ceil( blocks*t.block_size/1024/1024) -
+                              ceil( (nvl(hwm,1)*t.block_size)/1024/1024 ) savings
+              FROM        DBA_DATA_FILES A
+              INNER JOIN  DBA_TABLESPACES T
+                  on      T.TABLESPACE_NAME = a.TABLESPACE_NAME
+              left join  ( select    file_id,
+                                      max(block_id+blocks-1) hwm
+                            from      dba_extents
+                            group by  file_id ) b
+                  ON        A.FILE_ID = B.FILE_ID
+               WHERE a.TABLESPACE_NAME='PSAPSR3740X';
+
 
 ----------check Too many database files--------------------------
 
@@ -126,10 +171,10 @@ from v$parameter p where p.name = 'db_files';
 
 set lines 380
 set pages 999
+set colsep '|'
 col "Group Name"   form a20
 col "Disk Name"    form a25
 col "State"  form a12
-
 col "Type"   form a7
 col "gbtotal_Bruto"   	form 9999999999
 col gbtotal_livre_bruto form 9999999999
@@ -186,23 +231,49 @@ select name,  USABLE_FILE_MB, total_mb, free_mb from v$asm_diskgroup;
 --------------------se houver espaço add ou aumentar datafile ------------------
 
 
+     alter database datafile 'D:\ORADATA\ORIAL\AUDIT_DATA1.DBF' resize 2000m;
+     alter database datafile '+DG_MSAF_DATA/DBMSPPRD/DATAFILE/msafi_data.445.1133864823' resize 32767m;
+
+     alter database datafile '+DATA/PID/DATAFILE/system.304.1190621055' resize 1000m;
+     alter database datafile 'I:\ORACLE\BWP\SAPDATA6\SR_69\SR3.DATA73' resize 14000m;
+     alter database datafile '+DG_MSAF_DATA/DBMSPPRD/DATAFILE/msafi_index.558.1139421867' resize 32767m;
+     alter database datafile '+DG_MSAF_DATA/DBMSPPRD/DATAFILE/msafi_index.557.1139421843' resize 32767m;
+     alter database datafile '/oracle/PJP/sapdata3/sr3db_6/sr3db.data6' resize 32767m;
+     alter database datafile 'F:\ORACLE\BWP\SAPDATA3\SR3_26\SR3.DATA71' resize 32767m;
+
+alter database datafile '/oracle/ICT/data9/sysaux.data6' resize 26595m;
+alter database datafile '/oracle/ICT/data10/sysaux.data5' resize 32714m;
+alter database datafile '/oracle/ICT/data17/sysaux.data22' resize 11939m;
+alter database datafile '/oracle/ICT/data15/sysaux.data17' resize 11663m;
+alter database datafile '/oracle/ICT/data18/sysaux.data24' resize 19890m;
+
+ALTER database datafile '+GBIQA_DATA/GBISIMU/DATAFILE/sysaux.273.1097338477' resize 20000m;
+ALTER database datafile '+DG_MSAF_DATA/DBMSPDR1/DATAFILE/msaf_big_indexes.262.1066158935' resize 246040m;
 -- resize datafile 
-ALTER database datafile '/oracle/INTPRD/data3/ts_intranet_ix1_01.dbf' resize 27000m;
+ALTER database datafile '+DG_MSAF_DATA/DBMSPDR1/DATAFILE/msafd.269.1066146677' resize 9305685m;
      ALTER DATABASE DATAFILE '/oracle/INTPRD/data3/ts_intranet_dt1_30.dbf' RESIZE 15500m;  
      ALTER DATABASE DATAFILE '+DATA/PID/DATAFILE/psapundo.276.1119903879' RESIZE 4000m;  
-     ALTER database datafile '+DATA/PID/DATAFILE/sysaux.270.1119904063' resize 5500m;
+     ALTER database datafile 'H:\SYNSPED\ORADATA\SYND_DATA_11.DBF' resize 32767m;
 
 --create new datafile
-     alter tablespace EAI_DADOS_1024K add datafile '/oracle/ICT/data30/EAI_DADOS_1024K_11.dbf' size 5000m;
-     alter tablespace MSAF_DATA01 add datafile '+DATA_MSAF_2024' size 32767m;
+     alter tablespace PSAPSR3 add datafile '/oracle/ACP/sapdata3/sr3_13/sr3.data19' size 32767m;
+     alter tablespace PSAPSR3 add datafile '/oracle/ACP/sapdata3/sr3_13/sr3.data20' size 32767m;
+     alter tablespace MSAF_WORK_INDEXES add datafile '+DG_MSAF_DATA' size 8000m;
      alter tablespace MSAF_DATA01 add datafile '+DATA_MSAF_2024' size 32767m;
      alter tablespace EAIDEV add datafile '/oracle/DEAI/oradata3/eaidev14.dbf' size 520m;
+     alter tablespace MSAF_INDEX add datafile '+DG_MSAF_DATA' size 32767m;
      alter tablespace MSAF_DATA add datafile '+DG_MSAF_DATA' size 32767m;
      alter tablespace PSAPSR3 add datafile '/oracle/ACP/sapdata3/sr3_13/sr3.data18' size 32767m;
 
 
+create tablespace TBS_SGP_CFS datafile '+SGP_DATA' size 1g autoextend on ;
+create user SGP_CFS identified by "NovaSenha*2025_15bytes" quota unlimited on TBS_SGP_CFS;
 
+alter session set container=SGPPR;
 
+alter user SGP_CFS profile C##PRF_APPLICATION ;
+SELECT RESOURCE_NAME, RESOURCE_TYPE, LIMIT FROM DBA_PROFILES WHERE PROFILE LiKE '%C##CFS%';
+ 
 ------------------------------shirink---------------------------------------------
 set lines 300
 set pages 500
@@ -295,7 +366,7 @@ select file_id, file_name, (bytes/1024)/1024 bytes_MB, autoextensible from dba_t
 
 
 
-alter database tempfile '/oracle/SLP/sapdata2/temp_2/temp.data2' resize 3200m;
+alter database tempfile 'E:\ORACLE\SLJ\SAPDATA2\TEMP_1\TEMP.DATA1' resize 10000m;
 alter tablespace PSAPTEMP add tempfile '/oracle/SLP/sapdata2/temp_2/temp.data2' size 1000M;
  
 
@@ -404,5 +475,3 @@ where a.tablespace_name (+) = b.tablespace_name
 order by 1
 /
 
-
-teste

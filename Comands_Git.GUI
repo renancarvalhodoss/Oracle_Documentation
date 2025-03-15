@@ -25,3 +25,9 @@ git branch nome-da-branch
 
 # alterar branch
 git checkout nome-da-branch
+
+
+# mesclar branch
+git checkout updaly
+git commit -m "Descrição da alteração"
+git merge main
